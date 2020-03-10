@@ -9,11 +9,7 @@ $ go get -u github.com/rjewing/go-oauth2-dynamodb
 
 ## Usage
 ```
-
-
-		store := dynamo.NewTokenStore(client, tcfg)
-
-        package main
+package main
 
 import (
 	ddbstore "github.com/rjewing/go-oauth2-dynamodb"
