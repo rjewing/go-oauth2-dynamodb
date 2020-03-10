@@ -1,4 +1,4 @@
-package ddbstore
+package dynamodb
 
 import (
 	"encoding/json"
