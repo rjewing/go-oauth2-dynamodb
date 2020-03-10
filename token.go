@@ -43,7 +43,7 @@ type tokenData struct {
 	ExpiredAt time.Time `bson:"ExpiredAt"`
 }
 
-func initTable(client *dynamodb.DynamoDB, tokenConfig *TokenConfig) (err error) {
+func initTokenTable(client *dynamodb.DynamoDB, tokenConfig *TokenConfig) (err error) {
 	// Create authorization code table
 	input := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
@@ -151,7 +151,7 @@ func initTable(client *dynamodb.DynamoDB, tokenConfig *TokenConfig) (err error) 
 
 // NewTokenStore returns a new token store
 func NewTokenStore(client *dynamodb.DynamoDB, tokenConfig *TokenConfig) (store *TokenStore) {
-	initTable(client, tokenConfig)
+	initTokenTable(client, tokenConfig)
 	store = &TokenStore{
 		tcfg:   tokenConfig,
 		client: client,
