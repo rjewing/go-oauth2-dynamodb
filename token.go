@@ -3,9 +3,11 @@ package ddbstore
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"gopkg.in/mgo.v2/bson"
@@ -41,8 +43,115 @@ type tokenData struct {
 	ExpiredAt time.Time `bson:"ExpiredAt"`
 }
 
+func initTable(client *dynamodb.DynamoDB, tokenConfig *TokenConfig) (err error) {
+	// Create authorization code table
+	input := &dynamodb.CreateTableInput{
+		AttributeDefinitions: []*dynamodb.AttributeDefinition{
+			{
+				AttributeName: aws.String("ID"),
+				AttributeType: aws.String("S"),
+			},
+		},
+		KeySchema: []*dynamodb.KeySchemaElement{
+			{
+				AttributeName: aws.String("ID"),
+				KeyType:       aws.String("HASH"),
+			},
+		},
+		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+			ReadCapacityUnits:  aws.Int64(10),
+			WriteCapacityUnits: aws.Int64(10),
+		},
+		TableName: &tokenConfig.BasicCName,
+	}
+	_, err = client.CreateTable(input)
+	if err != nil {
+		if awsErr, ok := err.(awserr.Error); ok {
+			switch awsErr.Code() {
+			case dynamodb.ErrCodeResourceInUseException:
+				break
+			default:
+				fmt.Println("Got error calling CreateTable for authorization code:")
+				fmt.Println(awsErr.Error())
+				os.Exit(1)
+			}
+		}
+	}
+
+	// Create access token table
+	input = &dynamodb.CreateTableInput{
+		AttributeDefinitions: []*dynamodb.AttributeDefinition{
+			{
+				AttributeName: aws.String("ID"),
+				AttributeType: aws.String("S"),
+			},
+		},
+		KeySchema: []*dynamodb.KeySchemaElement{
+			{
+				AttributeName: aws.String("ID"),
+				KeyType:       aws.String("HASH"),
+			},
+		},
+		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+			ReadCapacityUnits:  aws.Int64(10),
+			WriteCapacityUnits: aws.Int64(10),
+		},
+		TableName: &tokenConfig.AccessCName,
+	}
+	_, err = client.CreateTable(input)
+	if err != nil {
+		if awsErr, ok := err.(awserr.Error); ok {
+			switch awsErr.Code() {
+			case dynamodb.ErrCodeResourceInUseException:
+				break
+			default:
+				fmt.Println("Got error calling CreateTable for access token:")
+				fmt.Println(awsErr.Error())
+				os.Exit(1)
+			}
+		}
+	}
+
+	// Create refresh token table
+	input = &dynamodb.CreateTableInput{
+		AttributeDefinitions: []*dynamodb.AttributeDefinition{
+			{
+				AttributeName: aws.String("ID"),
+				AttributeType: aws.String("S"),
+			},
+		},
+		KeySchema: []*dynamodb.KeySchemaElement{
+			{
+				AttributeName: aws.String("ID"),
+				KeyType:       aws.String("HASH"),
+			},
+		},
+		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+			ReadCapacityUnits:  aws.Int64(10),
+			WriteCapacityUnits: aws.Int64(10),
+		},
+		TableName: &tokenConfig.RefreshCName,
+	}
+
+	_, err = client.CreateTable(input)
+	if err != nil {
+		if awsErr, ok := err.(awserr.Error); ok {
+			switch awsErr.Code() {
+			case dynamodb.ErrCodeResourceInUseException:
+				break
+			default:
+				fmt.Println("Got error calling CreateTable for refresh token:")
+				fmt.Println(awsErr.Error())
+				os.Exit(1)
+			}
+		}
+	}
+	return
+}
+
 // NewTokenStore returns a new token store
 func NewTokenStore(client *dynamodb.DynamoDB, tokenConfig *TokenConfig) (store *TokenStore) {
+	initTable(client, tokenConfig)
 	store = &TokenStore{
 		tcfg:   tokenConfig,
 		client: client,
@@ -83,7 +192,7 @@ func InsertAuthorizationCode(ts *TokenStore, code string, data []byte, expiresAt
 // InsertAccessToken inserts an access code into the basic table
 func InsertAccessToken(ts *TokenStore, token string, basicID string, expiresAt string) (err error) {
 	params := &dynamodb.PutItemInput{
-		TableName: aws.String(ts.tcfg.BasicCName),
+		TableName: aws.String(ts.tcfg.AccessCName),
 		Item: map[string]*dynamodb.AttributeValue{
 			"ID": &dynamodb.AttributeValue{
 				S: aws.String(token),
