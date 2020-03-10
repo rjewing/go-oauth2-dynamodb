@@ -44,5 +44,5 @@ This sets up a local dynamodb server running on `http://localhost:8000`.
 
 ## MIT License
 ```
-Copyright (c) 2020 rjewing
+Copyright (c) 2020 Ryan Ewing
 ```
