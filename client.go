@@ -19,7 +19,7 @@ type ClientConfig struct {
 	ClientsCName string
 }
 
-// ClientStore MongoDB storage for OAuth 2.0
+// ClientStore DynamoDB storage for OAuth 2.0
 type ClientStore struct {
 	ccfg   *ClientConfig
 	dbName string
@@ -70,7 +70,7 @@ func initClientTable(client *dynamodb.DynamoDB, clientConfig *ClientConfig) (err
 	return
 }
 
-// NewClientStore create a client store instance based on mongodb
+// NewClientStore create a client store instance based on dynamodb
 func NewClientStore(client *dynamodb.DynamoDB, ccfg *ClientConfig) (store *ClientStore) {
 	initClientTable(client, ccfg)
 	store = &ClientStore{
