@@ -1,5 +1,6 @@
 # go-oauth2-dynamodb
 > Based on https://github.com/go-oauth2/mongo
+
 > Based on https://github.com/contamobi/go-oauth2-dynamodb
 
 ## Install
