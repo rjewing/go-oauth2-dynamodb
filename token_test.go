@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 
-	dynamo "github.com/rjewing/go-oauth2-dynamodb"
 	"gopkg.in/oauth2.v3/models"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -23,9 +22,9 @@ func TestTokenStore(t *testing.T) {
 		sess := session.Must(session.NewSession(config))
 		client := dynamodb.New(sess)
 
-		tcfg := dynamo.NewDefaultTokenConfig()
+		tcfg := NewDefaultTokenConfig()
 
-		store := dynamo.NewTokenStore(client, tcfg)
+		store := NewTokenStore(client, tcfg)
 		Convey("Test authorization code store", func() {
 			info := &models.Token{
 				ClientID:      "1",

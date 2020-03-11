@@ -9,8 +9,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
-
-	dynamo "github.com/rjewing/go-oauth2-dynamodb"
 )
 
 func TestClientStore(t *testing.T) {
@@ -21,7 +19,7 @@ func TestClientStore(t *testing.T) {
 	sess := session.Must(session.NewSession(config))
 	ddbClient := dynamodb.New(sess)
 
-	store := dynamo.NewClientStore(ddbClient, dynamo.NewDefaultClientConfig())
+	store := NewClientStore(ddbClient, NewDefaultClientConfig())
 
 	client := &models.Client{
 		ID:     "id",
