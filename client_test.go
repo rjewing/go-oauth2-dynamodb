@@ -1,4 +1,4 @@
-package ddbstore_test
+package dynamodb
 
 import (
 	"testing"
