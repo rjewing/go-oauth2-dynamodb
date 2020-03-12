@@ -1,4 +1,6 @@
 # go-oauth2-dynamodb
+DynamoDB store implementation for https://github.com/go-oauth2/oauth2
+
 > Based on https://github.com/go-oauth2/mongo
 
 > Based on https://github.com/contamobi/go-oauth2-dynamodb
